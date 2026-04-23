@@ -1,0 +1,832 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>WILD ZINE | Avant-Garde Nature Fashion</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0f130b;
+      font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, 'Inter', sans-serif;
+      color: #e2e8d0;
+      line-height: 1.3;
+      min-height: 100vh;
+    }
+
+    /* ========== FULLSCREEN WELCOME OVERLAY ========== */
+    .welcome-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0a0f07;
+      background-image: radial-gradient(circle at 20% 30%, rgba(70, 100, 40, 0.2) 0%, #060904 100%);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 1s cubic-bezier(0.2, 0.9, 0.4, 1.2), visibility 1s;
+      opacity: 1;
+      visibility: visible;
+      backdrop-filter: blur(0px);
+    }
+
+    .welcome-card {
+      background: rgba(20, 25, 12, 0.92);
+      backdrop-filter: blur(16px);
+      max-width: 620px;
+      width: 90%;
+      border-radius: 3rem;
+      padding: 3rem 2.5rem;
+      text-align: center;
+      border: 1px solid rgba(150, 180, 100, 0.5);
+      box-shadow: 0 40px 60px -20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,250,200,0.1);
+      animation: floatUp 0.8s ease-out;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 0; transform: translateY(50px) scale(0.96); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .welcome-icon {
+      font-size: 5rem;
+      margin-bottom: 1rem;
+      letter-spacing: 8px;
+    }
+    .welcome-card h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #d4e6b0, #9bc96e, #6f9e42);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.02em;
+    }
+    .welcome-sub {
+      font-size: 1rem;
+      color: #b8d48c;
+      border-bottom: 1px solid rgba(160, 200, 100, 0.4);
+      display: inline-block;
+      padding-bottom: 0.4rem;
+      margin: 1rem 0;
+    }
+    .welcome-text {
+      color: #cfdec0;
+      margin: 1.2rem 0 2rem;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+    .enter-btn {
+      background: #5d8540;
+      border: none;
+      padding: 1rem 2.8rem;
+      border-radius: 60px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .enter-btn:hover {
+      background: #7cac56;
+      transform: scale(1.03);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.4);
+    }
+    .welcome-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* ========== MAIN MAGAZINE ========== */
+    .magazine {
+      min-height: 100vh;
+      background: #0e1309;
+      background-image: linear-gradient(145deg, #121b0c 0%, #0a1007 100%);
+      opacity: 0;
+      transform: scale(0.97);
+      transition: opacity 1s ease, transform 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+    }
+    .magazine.reveal {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* ========== PRO LEVEL CSS GRID - FULL PAGE LAYOUT (NO CORNERS EMPTY) ========== */
+    .magazine-grid {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 2rem 2rem 3rem 2rem;
+    }
+
+    /* Master Grid - 12 columns, full width, dynamic */
+    .master-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.8rem;
+    }
+
+    /* Header - spans full */
+    .header-full {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      padding-bottom: 1.2rem;
+      margin-bottom: 0.8rem;
+      border-bottom: 2px solid rgba(160, 200, 100, 0.4);
+    }
+    .logo {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(125deg, #e2f0c4, #9bcd6c);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.02em;
+    }
+    .header-badge {
+      background: rgba(80, 110, 50, 0.5);
+      backdrop-filter: blur(8px);
+      padding: 0.4rem 1.3rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      border: 1px solid rgba(180, 210, 120, 0.5);
+    }
+
+    /* ===== SEARCH BAR + MAHAM NAME SECTION ===== */
+    .search-master-section {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      background: rgba(25, 35, 15, 0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 3rem;
+      padding: 0.6rem 1.8rem 0.6rem 2rem;
+      border: 1px solid rgba(150, 200, 100, 0.4);
+      margin-bottom: 0.5rem;
+    }
+    .search-wrapper {
+      flex: 2;
+      min-width: 200px;
+      display: flex;
+      align-items: center;
+      background: #1c2a10;
+      border-radius: 60px;
+      padding: 0.2rem 0.2rem 0.2rem 1.2rem;
+      border: 1px solid #6d9648;
+      transition: all 0.2s;
+    }
+    .search-wrapper:focus-within {
+      border-color: #bcf06c;
+      box-shadow: 0 0 0 2px rgba(160, 210, 80, 0.4);
+    }
+    .search-icon {
+      color: #b0da7a;
+      font-size: 1.2rem;
+      margin-right: 0.6rem;
+    }
+    #searchInput {
+      background: transparent;
+      border: none;
+      padding: 0.7rem 0;
+      width: 100%;
+      color: #f0fce8;
+      font-size: 0.95rem;
+      outline: none;
+      font-family: inherit;
+    }
+    #searchInput::placeholder {
+      color: #8baa68;
+      font-style: italic;
+    }
+    .search-btn {
+      background: #507a30;
+      border: none;
+      padding: 0.5rem 1.4rem;
+      border-radius: 50px;
+      margin-left: 0.5rem;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.8rem;
+    }
+    .search-btn:hover {
+      background: #74a84a;
+    }
+    .maham-signature {
+      flex: 1;
+      text-align: right;
+      font-size: 1.1rem;
+      font-weight: 500;
+      background: linear-gradient(120deg, #daf2b0, #b3df7a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    .maham-signature span {
+      font-size: 1.4rem;
+    }
+    .search-results-msg {
+      grid-column: 1 / -1;
+      background: #1b2a0eaa;
+      border-radius: 2rem;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.85rem;
+      color: #cbe6a8;
+      text-align: center;
+      backdrop-filter: blur(4px);
+      transition: 0.2s;
+      display: none;
+    }
+    .search-results-msg.show {
+      display: block;
+    }
+
+    /* ===== 4 IMAGE CARDS - MODERN, FULL DETAIL, NO CORNER GAPS ===== */
+    .img-master {
+      border-radius: 2rem;
+      overflow: hidden;
+      background: #1a2412;
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      border: 1px solid rgba(130, 170, 80, 0.3);
+      box-shadow: 0 20px 30px -15px rgba(0,0,0,0.5);
+    }
+    .img-master:hover {
+      transform: translateY(-8px);
+      border-color: #9bc96e;
+      box-shadow: 0 30px 40px -18px rgba(0,0,0,0.6);
+    }
+    .img-wrapper {
+      width: 100%;
+      height: 280px;
+      overflow: hidden;
+    }
+    .img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.7s ease;
+      display: block;
+    }
+    .img-master:hover .img-wrapper img {
+      transform: scale(1.05);
+    }
+    .img-info {
+      padding: 1.2rem 1.3rem 1.5rem;
+      background: linear-gradient(135deg, #1c2713, #131c0c);
+    }
+    .img-info h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #daf0b5;
+      margin-bottom: 0.4rem;
+    }
+    .img-info p {
+      font-size: 0.85rem;
+      color: #bcd69c;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+    .img-detail {
+      font-size: 0.7rem;
+      color: #8bb068;
+      margin-top: 8px;
+      letter-spacing: 0.3px;
+    }
+
+    /* Dynamic image placements - full flow no empty corners */
+    .img-1 { grid-column: span 5; }
+    .img-2 { grid-column: span 7; }
+    .img-3 { grid-column: span 4; }
+    .img-4 { grid-column: span 8; }
+
+    /* Hero editorial section */
+    .hero-block {
+      grid-column: span 7;
+      background: linear-gradient(135deg, #1f2c14, #182210);
+      border-radius: 2rem;
+      overflow: hidden;
+      border: 1px solid rgba(150, 190, 90, 0.4);
+      transition: 0.2s;
+    }
+    .hero-img-area {
+      height: 280px;
+      background: linear-gradient(105deg, #6b8f46, #9fc074), url('https://images.pexels.com/photos/1183266/pexels-photo-1183266.jpeg?auto=compress&cs=tinysrgb&w=1000&h=600&fit=crop');
+      background-size: cover;
+      background-blend-mode: overlay;
+      background-position: center 30%;
+    }
+    .hero-text-block {
+      padding: 1.8rem;
+    }
+    .hero-text-block h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #e9f5d3;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: #3f6030aa;
+      padding: 0.3rem 1.2rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      margin-top: 1rem;
+    }
+
+    /* clam + fashion quote */
+    .clam-card {
+      grid-column: span 5;
+      background: #1a2a10;
+      border-radius: 2rem;
+      padding: 1.8rem;
+      border: 1px solid #5a8240;
+    }
+    .clam-card h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #daf0b5;
+    }
+    .style-quote-card {
+      grid-column: span 7;
+      background: #202f14;
+      border-radius: 2rem;
+      padding: 1.5rem 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .quote-big {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #e2f0c4;
+    }
+    .pill-hash {
+      background: #4c6e32;
+      padding: 0.5rem 1.2rem;
+      border-radius: 60px;
+    }
+
+    .awesome-card {
+      grid-column: span 5;
+      background: #1e3012;
+      border-radius: 2rem;
+      padding: 1.6rem;
+      text-align: center;
+    }
+    .awesome-card .giant-text {
+      font-size: 3rem;
+      font-weight: 800;
+      color: #bde08c;
+    }
+
+    .photography-card {
+      grid-column: span 7;
+      background: linear-gradient(125deg, #2d4520, #1e3012);
+      border-radius: 2rem;
+      padding: 1.8rem;
+      background-image: url('https://images.pexels.com/photos/2834917/pexels-photo-2834917.jpeg?auto=compress&cs=tinysrgb&w=800&h=500&fit=crop');
+      background-size: cover;
+      background-blend-mode: overlay;
+      background-color: #1f3014cc;
+    }
+    .photography-card h3 {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    .mini-grid {
+      grid-column: span 5;
+      background: #19260e;
+      border-radius: 2rem;
+      padding: 1.2rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.8rem;
+    }
+    .mini-card {
+      background: #2c421c;
+      border-radius: 1.2rem;
+      padding: 1rem;
+      text-align: center;
+      transition: 0.2s;
+    }
+
+    /* ===== ABOUT + CONTACT SECTION (1 line name phir next) ===== */
+    .about-contact-wrapper {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.8rem;
+      background: #121f0b;
+      border-radius: 2rem;
+      padding: 2rem;
+      margin-top: 0.8rem;
+      border: 1px solid #5c8040;
+    }
+    .about-section h4, .contact-section h4 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #d0f0a0;
+      margin-bottom: 1rem;
+      border-left: 4px solid #8fc060;
+      padding-left: 1rem;
+    }
+    .about-section p {
+      color: #c5e0a5;
+      line-height: 1.5;
+    }
+    .contact-line {
+      margin-bottom: 1rem;
+    }
+    .contact-label {
+      font-weight: 700;
+      color: #b8e080;
+      display: inline-block;
+      min-width: 110px;
+    }
+    .contact-value {
+      color: #d2f0b0;
+    }
+    .social-badges {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .social-badges span {
+      background: #2d4520;
+      padding: 0.3rem 1rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+    }
+
+    /* subscribe footer */
+    .subscribe-footer {
+      grid-column: 1 / -1;
+      background: #16200e;
+      border-radius: 2rem;
+      padding: 1.2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+    .btn-feel {
+      background: #5c8740;
+      border: none;
+      padding: 0.6rem 1.8rem;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      color: white;
+    }
+    .footer-note {
+      grid-column: 1 / -1;
+      text-align: center;
+      font-size: 0.7rem;
+      padding-top: 1.5rem;
+      color: #8aa868;
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .master-grid { gap: 1.2rem; }
+      .img-1, .img-2, .img-3, .img-4, .hero-block, .clam-card, .style-quote-card, .awesome-card, .photography-card, .mini-grid {
+        grid-column: span 12 !important;
+      }
+      .about-contact-wrapper { grid-template-columns: 1fr; gap: 1.5rem; }
+      .img-wrapper { height: 240px; }
+      .search-master-section {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .maham-signature {
+        justify-content: center;
+        text-align: center;
+      }
+    }
+    @media (max-width: 650px) {
+      .magazine-grid { padding: 1rem; }
+      .logo { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- WELCOME OVERLAY -->
+<div class="welcome-overlay" id="welcomeOverlay">
+  <div class="welcome-card">
+    <div class="welcome-icon">🌾🍃🌿</div>
+    <h1>WELCOME.</h1>
+    <div class="welcome-sub">MAGAZINE · ZINE CULTURE</div>
+    <div class="welcome-text">
+      ✦ Step into the world where <strong>Nature meets High Fashion</strong> ✦<br>
+      Organic silhouettes · Raw elegance · The rhythm of the earth.<br>
+      <span style="font-size: 0.9rem; display: inline-block; margin-top: 10px;">✨ Feel Unique & Good ✨</span>
+    </div>
+    <button class="enter-btn" id="enterMagazineBtn">ENTER THE MAGAZINE &nbsp; 🌿</button>
+  </div>
+</div>
+
+<!-- MAIN MAGAZINE - FULL PAGE, NO CORNER EMPTY, PRO LEVEL -->
+<div class="magazine" id="magazineContainer">
+  <div class="magazine-grid">
+    <div class="master-grid">
+
+      <!-- HEADER -->
+      <div class="header-full">
+        <div class="logo">🌿 ZINE·MAGA</div>
+        <div class="header-badge">🌾 CONTACT US · WELCOME. ISSUE 12 🌾</div>
+      </div>
+
+      <!-- ========== NEW SEARCH BAR + MAHAM NAME SECTION ========== -->
+      <div class="search-master-section">
+        <div class="search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search 'wild', 'fashion', 'nature', 'photography'...">
+          <button class="search-btn" id="searchButton">SEARCH</button>
+        </div>
+        <div class="maham-signature">
+          <span>🌙</span> ✦ MAHAM ✦ <span>🌿</span>
+        </div>
+      </div>
+      <div id="searchResultsMsg" class="search-results-msg"></div>
+
+      <!-- 4 PICTURES - FIXED HIGH QUALITY, FULL DETAILS (NO WELCOME TEXT) -->
+      <div class="img-master img-1" data-tags="wild runway nature couture fashion">
+        <div class="img-wrapper">
+          <img src="https://images.pexels.com/photos/1183266/pexels-photo-1183266.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop" alt="wild runway" loading="lazy">
+        </div>
+        <div class="img-info">
+          <h3>🌿 WILD RUNWAY</h3>
+          <p>Organic silhouettes merge with ancient woods. Ethereal collection debut.</p>
+          <div class="img-detail">📸 Elena Moss · Nature couture</div>
+        </div>
+      </div>
+
+      <div class="img-master img-2" data-tags="botanical elegance floral haute couture fashion">
+        <div class="img-wrapper">
+          <img src="https://images.pexels.com/photos/3222073/pexels-photo-3222073.jpeg?auto=compress&cs=tinysrgb&w=1000&h=700&fit=crop" alt="botanical elegance" loading="lazy">
+        </div>
+        <div class="img-info">
+          <h3>🌸 BOTANICAL ELEGANCE</h3>
+          <p>Floral textures meet haute couture. Hand-embroidered petals.</p>
+          <div class="img-detail">👗 Mira Solstice · Botanical collection</div>
+        </div>
+      </div>
+
+      <div class="img-master img-3" data-tags="raw textures sustainable eco fashion linen">
+        <div class="img-wrapper">
+          <img src="https://images.pexels.com/photos/2834917/pexels-photo-2834917.jpeg?auto=compress&cs=tinysrgb&w=700&h=550&fit=crop" alt="raw textures" loading="lazy">
+        </div>
+        <div class="img-info">
+          <h3>🍃 RAW TEXTURES</h3>
+          <p>Linen, hemp & regenerative fabrics. Zero waste movement.</p>
+          <div class="img-detail">♻️ Sustainable fashion · eco fibers</div>
+        </div>
+      </div>
+
+      <div class="img-master img-4" data-tags="forest couture earth tone mystical woodland fashion">
+        <div class="img-wrapper">
+          <img src="https://images.pexels.com/photos/3222018/pexels-photo-3222018.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop" alt="forest couture" loading="lazy">
+        </div>
+        <div class="img-info">
+          <h3>🌲 FOREST COUTURE</h3>
+          <p>Earth-tone layers & mystical draping. Inspired by twilight woods.</p>
+          <div class="img-detail">🍂 Limited edition · woodland fantasy</div>
+        </div>
+      </div>
+
+      <!-- HERO EDITORIAL -->
+      <div class="hero-block" data-tags="editorial style fashion magazine">
+        <div class="hero-img-area"></div>
+        <div class="hero-text-block">
+          <h2>THE AWESOME WIDE RANGE OF STYLE.</h2>
+          <p>"FASHION MAGAZINE DESIGN LAYOUT" — wilderness meets runway. Organic textures, raw elegance, rhythm of earth.</p>
+          <div class="hero-tag">✨ FASHION PHOTOGRAPHY · FEEL UNIQUE ✨</div>
+        </div>
+      </div>
+
+      <!-- CLAM YOUR FASHION -->
+      <div class="clam-card" data-tags="clam fashion style">
+        <h2>CLAM YOUR <br> FASHION.</h2>
+        <div style="background: #345025aa; display: inline-block; padding: 0.3rem 1.2rem; border-radius: 30px; margin-top: 0.8rem;">✦ WIDE RANGE OF STYLE ✦</div>
+        <p style="margin-top: 1rem;">organic patterns | botanical silhouettes | eco-couture</p>
+      </div>
+
+      <!-- FASHION QUOTE -->
+      <div class="style-quote-card" data-tags="quote fashion magazine design">
+        <div class="quote-big">
+          “FASHION MAGAZINE <br> DESIGN LAYOUT” 
+          <span style="font-size: 0.85rem; display: block;">minimalism meets wild nature</span>
+        </div>
+        <div class="pill-hash">#FashionNeverSleeps</div>
+      </div>
+
+      <!-- AWESOME PANEL -->
+      <div class="awesome-card" data-tags="awesome style wide range">
+        <div class="giant-text">THE AWESOME</div>
+        <p style="margin-top: 0.3rem;">WIDE RANGE OF STYLE — avant-garde to earthy minimalism.<br> ✧ FASHION. ✧</p>
+        <div style="margin-top: 0.6rem;">🎋 CLAM YOUR FASHION. 🎋</div>
+      </div>
+
+      <!-- PHOTOGRAPHY SPOT -->
+      <div class="photography-card" data-tags="photography feel unique good">
+        <h3>FASHION <br> PHOTOGRAPHY.</h3>
+        <div style="font-size: 1.4rem; font-weight: 500; margin: 0.6rem 0;">✨ FEEL UNIQUE AND GOOD ✨</div>
+        <p>lensed in misty highlands — raw, authentic, timeless.</p>
+      </div>
+
+      <!-- MINI GALLERY -->
+      <div class="mini-grid" data-tags="editorial magazine cult photography">
+        <div class="mini-card">🍃 EDITORIAL <br><strong>MAGAZINE CORE</strong></div>
+        <div class="mini-card">🌸 FASHION ART <br><strong>ZINE CULT</strong></div>
+        <div class="mini-card">🌾 NATURE LENS <br><strong>PHOTOGRAPHY</strong></div>
+        <div class="mini-card">🌙 #564273415 <br><strong>FASHION NEVER SLEEPS</strong></div>
+      </div>
+
+      <!-- ABOUT + CONTACT SECTION (1 LINE NAME PHIR NEXT) -->
+      <div class="about-contact-wrapper">
+        <div class="about-section">
+          <h4>ABOUT ZINE</h4>
+          <p>Wild Zine is a bi-annual fashion magazine celebrating the deep connection between nature and couture. Founded in 2024, we showcase sustainable luxury, raw elegance, and editorial storytelling that respects the earth.</p>
+        </div>
+        <div class="contact-section">
+          <h4>CONTACT US</h4>
+          <div class="contact-line">
+            <span class="contact-label">Magazine Name:</span>
+            <span class="contact-value">WILD ZINE · NATURE FASHION</span>
+          </div>
+          <div class="contact-line">
+            <span class="contact-label">Email:</span>
+            <span class="contact-value">hello@wildzine.com</span>
+          </div>
+          <div class="contact-line">
+            <span class="contact-label">Phone:</span>
+            <span class="contact-value">+1 (800) 452-9873</span>
+          </div>
+          <div class="contact-line">
+            <span class="contact-label">Instagram:</span>
+            <span class="contact-value">@wildzine.mag</span>
+          </div>
+          <div class="social-badges">
+            <span>🌿 IG</span>
+            <span>🍃 TW</span>
+            <span>🌸 FB</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUBSCRIBE / CONTACT FOOTER -->
+      <div class="subscribe-footer">
+        <span style="font-weight: 600;">📬 SUBSCRIBE TO NEWSLETTER</span>
+        <div style="display: flex; gap: 1rem;">
+          <span style="background: #2f4620; padding: 0.4rem 1rem; border-radius: 40px;">INSTYLE NATURE</span>
+          <button class="btn-feel" id="uniqueBtn">⚡ FEEL UNIQUE</button>
+        </div>
+      </div>
+
+      <!-- FOOTER NOTE -->
+      <div class="footer-note">
+        <span>🌿 FASHION MAGAZINE DESIGN LAYOUT — NATURE INSPIRED EDITION 🌿</span><br>
+        <span>MAGA ZINE | THE AWESOME WIDE RANGE OF STYLE | FASHION NEVER SLEEPS</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // WELCOME + REVEAL MAGAZINE
+  const overlay = document.getElementById('welcomeOverlay');
+  const magazine = document.getElementById('magazineContainer');
+  const enterBtn = document.getElementById('enterMagazineBtn');
+
+  function showMagazine() {
+    overlay.classList.add('hidden');
+    setTimeout(() => {
+      magazine.classList.add('reveal');
+      document.body.style.overflow = 'auto';
+      console.log("✨ Pro magazine loaded — 4 images, search bar + Maham name, full grid");
+    }, 400);
+  }
+
+  if (enterBtn) enterBtn.addEventListener('click', showMagazine);
+
+  // FEEL UNIQUE BUTTON (interactive)
+  const feelBtn = document.getElementById('uniqueBtn');
+  if (feelBtn) {
+    feelBtn.addEventListener('click', () => {
+      const quotes = [
+        "🌱 Feel unique, feel good — fashion rooted in nature 🌱",
+        "🍃 The awesome range of style embraces the wild. 🍃",
+        "🌸 'Fashion never sleeps' — and neither does the forest 🌸",
+        "🌾 CLAM YOUR FASHION — let nature be your runway 🌾",
+        "📸 4 stunning images with deep editorial stories!"
+      ];
+      alert(quotes[Math.floor(Math.random() * quotes.length)]);
+    });
+  }
+
+  // ========== SEARCH FUNCTIONALITY (dynamic highlight / filtering) ==========
+  const searchInput = document.getElementById('searchInput');
+  const searchButton = document.getElementById('searchButton');
+  const searchMsgDiv = document.getElementById('searchResultsMsg');
+  
+  // Collect all searchable blocks (image cards, hero, clam, quote, awesome, photo, mini, about-contact optional)
+  const searchableItems = document.querySelectorAll('.img-master, .hero-block, .clam-card, .style-quote-card, .awesome-card, .photography-card, .mini-grid');
+  
+  function performSearch() {
+    const query = searchInput.value.trim().toLowerCase();
+    if (!query) {
+      // reset: show all blocks, remove hidden class, clear message
+      searchableItems.forEach(item => {
+        item.style.display = '';
+        item.style.opacity = '';
+      });
+      searchMsgDiv.classList.remove('show');
+      searchMsgDiv.innerHTML = '';
+      return;
+    }
+    
+    let matchCount = 0;
+    searchableItems.forEach(item => {
+      // get text content from item and its children + possible data-tags
+      let textContent = item.innerText.toLowerCase();
+      const dataTags = item.getAttribute('data-tags') ? item.getAttribute('data-tags').toLowerCase() : '';
+      const fullSearchPool = textContent + ' ' + dataTags;
+      if (fullSearchPool.includes(query)) {
+        item.style.display = '';
+        item.style.opacity = '1';
+        matchCount++;
+      } else {
+        item.style.display = 'none';
+      }
+    });
+    
+    if (matchCount === 0) {
+      searchMsgDiv.innerHTML = `🔍 No results for "${escapeHtml(query)}". Try: wild, nature, fashion, photography, eco.`;
+      searchMsgDiv.classList.add('show');
+    } else {
+      searchMsgDiv.innerHTML = `✨ ${matchCount} result(s) found for “${escapeHtml(query)}” ✨`;
+      searchMsgDiv.classList.add('show');
+      // auto hide message after 4 sec
+      setTimeout(() => {
+        if (searchMsgDiv.classList.contains('show') && searchInput.value.trim().toLowerCase() === query) {
+          // but don't hide if still same query? keep optional but fine.
+        }
+      }, 4000);
+    }
+  }
+  
+  function escapeHtml(str) {
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+  
+  if (searchButton) {
+    searchButton.addEventListener('click', performSearch);
+  }
+  if (searchInput) {
+    searchInput.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') performSearch();
+    });
+  }
+  
+  // initial body scroll lock while welcome active
+  document.body.style.overflow = 'hidden';
+  // fallback: after reveal scroll enabled via timeout if needed
+</script>
+</body>
+</html>
+```
